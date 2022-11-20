@@ -7,12 +7,15 @@ Official project can be accessed on [github](https://github.com/Wcbn38/SecureFol
 The project is divided in 3 sub-projects:
 - SecureFolderCore
 - SecureFolderCMD
-- SecureFolderInterface
+- SecureFolderMFC
 
 ## SecureFolderCore
 
 This sub-project contains the core of the cypherer. 2 function are essential:
 `cypher` and `decypher`.
+It also includes two usefull function `mapFolder` and `unmapFolder`
+
+It is to note that the SHA256 key generator is standalone.
 
 Only a few option are handled.
 
@@ -20,6 +23,6 @@ Only a few option are handled.
 
 This folder is for the command line project. It is actually only used for tests.
 
-## SecureFolderinterface
+## SecureFolderMFC (GUI)
 
 This folder contains the windows interface. It currently handles no custom options for the user.
