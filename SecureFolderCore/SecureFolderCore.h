@@ -8,7 +8,6 @@
 #define NULL 0
 
 #define ERR_NO_ERR 0x0000
-
 #define ERR_CANT_OPEN_FILE 0x0001
 #define ERR_CANT_OPEN_DIR 0x0002
 #define ERR_CANT_WRITE 0x0003
@@ -28,32 +27,18 @@
 #define ERR_CANT_DECYPH 0x0051
 #define ERR_UNHANDLED_KEY_MODE 0x0052
 
+#define ERR_HEAP_ERROR 0x0060
+
 #define SFC_CALLBACK void _cdecl
 
 namespace SFC
 {
 	//ENUMS
 
-	namespace CYPHER_METHOD {
-		enum CYPHER_METHOD : short
+	namespace MAPPING_METHOD {
+		enum MAPPING_METHOD : short
 		{
 			UNSET = NULL, SEQUENTIAL, MAPPED
-		};
-	}
-
-	namespace KEY_SAVING_METHOD
-	{
-		enum KEY_SAVING_METHOD : short
-		{
-			UNSET = NULL, PASSWORD, USB, FILE
-		};
-	}
-
-	namespace DECYPHER_METHOD
-	{
-		enum DECYPHER_METHOD : short
-		{
-			UNSET = NULL, VIRTUAL_DISK, COPY, VIRTUAL_FTP
 		};
 	}
 
@@ -61,15 +46,9 @@ namespace SFC
 	{
 		enum KEY_MODE : short
 		{
-			UNSET = NULL, CLASSIC, EVOLVING
-		};
-	}
-
-	namespace STATUS
-	{
-		enum STATUS : short
-		{
-			GET_HASH, WRITING_HEADER, MAPPING_FILES, CYPHERING, FINISHED
+			UNSET = NULL,
+			CLASSIC,
+			EVOLVING
 		};
 	}
 
@@ -78,25 +57,8 @@ namespace SFC
 	struct KEY256
 	{
 		unsigned long key[8];
+		friend bool operator==(const SFC::KEY256& a, const SFC::KEY256& b);
 	};
-
-	struct SECURE_FOLDER_PROPS
-	{
-		CYPHER_METHOD::CYPHER_METHOD cypherMethod = CYPHER_METHOD::UNSET;
-		KEY_MODE::KEY_MODE keyMode = KEY_MODE::UNSET;
-		KEY_SAVING_METHOD::KEY_SAVING_METHOD savingMethod = KEY_SAVING_METHOD::UNSET;
-		char* passwd;
-		char* cypherPath = NULL;
-		DECYPHER_METHOD::DECYPHER_METHOD decypherMethod = DECYPHER_METHOD::UNSET;
-		char* decypherPath = NULL;
-	};
-
-	//LAST ERROR
-	extern unsigned int sfcErrno;
-
-	int getLastError();
-	STATUS::STATUS getStatus();
-	long long getRead();
 
 	//FUNCTIONS
 
@@ -116,14 +78,22 @@ namespace SFC
 	Maps and cyphers folder to a file.
 
 	Parameters:
-		props: properties of the file to cypher
-		callback: callback to run on each step of the cyphering (GET_HASH, WRITING_HEADER, MAPPING_FILES, CYPHERING, FINISHED)
+		key: SHA256 key
+		srcFile: file to cypher
+		outFile: file to write to
+		mode: cyphering mode
 
 	Returns:
 		256 bit key
 	*/
-	int cypher(SECURE_FOLDER_PROPS props, SFC_CALLBACK callback(void) = NULL);
-	SECURE_FOLDER_PROPS* decypher(SECURE_FOLDER_PROPS* props, SFC_CALLBACK callback(void) = NULL);
+	int cypherFile(SFC::KEY256 key, std::fstream* srcFile, std::fstream* outFile, SFC::KEY_MODE::KEY_MODE mode, long long* byteCount = NULL);
+	int decypherFile(KEY256 key, std::fstream* srcFile, std::fstream* outFile, long long* byteCount = NULL);
+
+	int mapFolder(std::fstream* dest, char* path, char* entry, long long* byteCount = NULL, SFC_CALLBACK callback(char* fileFound, bool status) = NULL);
+	int unmapFolder(std::fstream* src, char* folderPath, long long* byteCount = NULL, SFC_CALLBACK callback(char* fileFound, bool status) = NULL);
+	KEY256 createKeyChecker(KEY256 key);
+	//TODO: int readMap()
+	int readHeader(std::fstream* src, SFC::KEY256* key, SFC::KEY_MODE::KEY_MODE* mode);
 
 	void cypherRawData(unsigned char* data, long size, SFC::KEY256* key);
 	void cypherRawDataEvolve(unsigned char* data, long size, SFC::KEY256* key);

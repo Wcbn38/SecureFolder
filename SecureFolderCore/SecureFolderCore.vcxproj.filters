@@ -24,7 +24,7 @@
     <ClCompile Include="SecureFolderCoreDecypher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SecureFolderCore.cpp">
+    <ClCompile Include="SecureFolderCoreMapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

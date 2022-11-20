@@ -201,3 +201,12 @@ void SFC::cypherKeyEvolve(SFC::KEY256* key)
 	key->key[6] = ROTR(key->key[6], 19);
 	key->key[7] = ROTR(key->key[7], 23);
 }
+
+bool SFC::operator==(const SFC::KEY256& a, const SFC::KEY256& b)
+{
+	for (int i = 0; i < 8; i++)
+		if (a.key[i] != b.key[i])
+			return false;
+
+	return true;
+}
