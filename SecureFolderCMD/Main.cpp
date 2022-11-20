@@ -3,21 +3,26 @@
 
 using namespace std;
 
-int main()
+SFC_CALLBACK callback(char* outFile, bool status)
 {
-	cout << "STARTING" << endl;
+	cout << outFile << endl;
+}
 
-	SFC::SECURE_FOLDER_PROPS props;
-	props.cypherMethod = SFC::CYPHER_METHOD::SEQUENTIAL;
-	props.cypherPath = (char*) "..\\..\\testEnv\\test.sfp";
-	props.decypherMethod = SFC::DECYPHER_METHOD::COPY;
-	props.decypherPath = (char*) "..\\..\\testEnv\\cyph\\";
-	props.passwd = (char*) "passwd";
-	props.savingMethod = SFC::KEY_SAVING_METHOD::PASSWORD;
+int main()
+{ 
+	fstream dest("..\\..\\map.tmp", ios_base::binary | ios_base::out | ios_base::trunc);
 
-	//SFC::cypher(props);
-	//SFC::decypher(&props);
+	char path[256];
+	char entry[256];
+	strcpy_s<256>(path, "..\\..\\testEnv");
+	strcpy_s<256>(entry, ".");
+	SFC::mapFolder(&dest, path, entry, NULL, callback);
+	dest.close();
 
-	cout << "FINISHED" << endl;
-	while (getchar() != '\n');
+	dest.open("..\\..\\map.tmp", ios_base::binary | ios_base::in);
+	cout << "-----------------------" << endl;
+	strcpy_s<256>(path, "../../UNMAP/");
+	SFC::unmapFolder(&dest, path, NULL, callback);
+
+	dest.close();
 }
